@@ -1,7 +1,3 @@
-Here's an updated README with Docker instructions to pass environment variables:
-
----
-
 # Document Processing API
 
 A FastAPI-based service for processing and analyzing PDF documents. This application uses embeddings to generate extended metadata, such as title, summaries, and tags, for uploaded documents, and integrates with backend services for further processing.
@@ -16,6 +12,10 @@ A FastAPI-based service for processing and analyzing PDF documents. This applica
     -   **pipeline/pdf_pipeline.py**: Document processing pipeline, including text splitting and embedding-based analysis.
     -   **util/llm_provider.py**: Interface for connecting to LLM (large language model) providers.
 -   **Dockerfile**: Configuration for containerizing the application.
+
+## Prerequisites
+
+-   Python 3.11 is required to run this application.
 
 ## Installation
 
@@ -61,16 +61,12 @@ To build and run the application in a Docker container, follow these steps:
 1. Build the Docker image:
 
     ```bash
-    docker build -t document-processing-api .
+    docker build -t pdf-module .
     ```
 
 2. Run the container, passing environment variables from your `.env` file:
     ```bash
-    docker run --env-file .env -p 80:80 document-processing-api
+    docker run --env-file .env -p 80:80 pdf-module
     ```
 
 The application will now be accessible at `http://localhost:80`.
-
----
-
-This should set up the container with the necessary environment variables.
