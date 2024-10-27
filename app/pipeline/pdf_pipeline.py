@@ -3,8 +3,8 @@ from typing import List
 
 from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_ollama import OllamaEmbeddings
 
 from app.models.schemas import DocumentMetadata
 from app.util.llm_provider import LLMProvider
@@ -32,18 +32,16 @@ class PDFAnalysisPipeline:
         vectorstore = FAISS.from_texts(texts=all_text_chunks, embedding=self.embeddings)
 
         # Generate all metadata in parallel for better performance
-        title = await self._generate_title(vectorstore, pages[0].page_content)
-        summary = await self._generate_summary(vectorstore, pages[0].page_content)
-        short_summary = await self._generate_short_summary(
-            vectorstore, pages[0].page_content
-        )
-        tags = await self._generate_tags(vectorstore, pages[0].page_content)
+        title = await self._generate_title(vectorstore)
+        summary = await self._generate_summary(vectorstore)
+        short_summary = await self._generate_short_summary(vectorstore)
+        tags = await self._generate_tags(vectorstore)
 
         return DocumentMetadata(
             title=title, summary=summary, short_summary=short_summary, tags=tags
         )
 
-    async def _generate_title(self, vectorstore: FAISS, example_text: str) -> str:
+    async def _generate_title(self, vectorstore: FAISS) -> str:
         """
         Generate a descriptive title for the document.
         """
@@ -68,7 +66,7 @@ class PDFAnalysisPipeline:
 
         return clean_title
 
-    async def _generate_summary(self, vectorstore: FAISS, example_text: str) -> str:
+    async def _generate_summary(self, vectorstore: FAISS) -> str:
         """
         Generate a detailed summary identifying the document type and its main points.
         """
@@ -90,9 +88,7 @@ class PDFAnalysisPipeline:
 
         return await self.llm_provider.generate(prompt)
 
-    async def _generate_short_summary(
-        self, vectorstore: FAISS, example_text: str
-    ) -> str:
+    async def _generate_short_summary(self, vectorstore: FAISS) -> str:
         """
         Generate a concise summary (2-3 sentences) of the document's key points.
         """
@@ -113,7 +109,7 @@ class PDFAnalysisPipeline:
 
         return await self.llm_provider.generate(prompt)
 
-    async def _generate_tags(self, vectorstore: FAISS, example_text: str) -> List[str]:
+    async def _generate_tags(self, vectorstore: FAISS) -> List[str]:
         """
         Generate relevant tags based on document content.
         """

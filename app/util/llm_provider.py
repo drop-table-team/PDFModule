@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from langchain_community.llms import Ollama
+from langchain_ollama import OllamaLLM
 
 
 class LLMProvider(ABC):
@@ -12,10 +12,10 @@ class LLMProvider(ABC):
 
 class OllamaProvider(LLMProvider):
     def __init__(self, base_url: str, model: str):
-        self.llm = Ollama(base_url=base_url, model=model)
+        self.llm = OllamaLLM(base_url=base_url, model=model)
 
     async def generate(self, prompt: str) -> str:
-        return self.llm.predict(prompt)
+        return self.llm.invoke(prompt)
 
 
 class LLMFactory:
