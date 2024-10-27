@@ -1,3 +1,4 @@
+import re
 from typing import List
 
 from langchain.docstore.document import Document
@@ -61,7 +62,10 @@ class PDFAnalysisPipeline:
         - Der Titel muss ohne Einleitung, zusätzliche Texte oder Erklärungen sein.
         """
 
-        return await self.llm_provider.generate(prompt)
+        title = await self.llm_provider.generate(prompt).strip
+        clean_title = re.sub(r"[^a-zA-Z0-9]", "", title)
+
+        return clean_title
 
     async def _generate_summary(self, vectorstore: FAISS, example_text: str) -> str:
         """
