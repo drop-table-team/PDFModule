@@ -51,11 +51,15 @@ class PDFAnalysisPipeline:
         combined_text = "\n".join(doc.page_content for doc in relevant_chunks)
 
         prompt = f"""
-        Basierend auf diesem Textauszug:
+        Du bist ein erfahrener Dokumentenanalytiker. Analysiere den folgenden Textauszug und erzeuge einen prägnanten und relevanten Titel für das Dokument.
+
+        Textauszug:
         {combined_text}
         
-        Generiere einen prägnanten, aussagekräftigen Titel für das Dokument (maximal 10 Wörter).
-        Gib nur den Titel zurück, ohne zusätzliche Erklärungen."""
+        # Ausgabeanforderungen
+        - Gib nur den Titel zurück, bestehend aus maximal 10 Wörtern.
+        - Der Titel muss ohne Einleitung, zusätzliche Texte oder Erklärungen sein.
+        """
 
         return await self.llm_provider.generate(prompt)
 
@@ -68,13 +72,15 @@ class PDFAnalysisPipeline:
         combined_text = "\n".join(doc.page_content for doc in relevant_chunks)
 
         prompt = f"""
-        Basierend auf den folgenden relevanten Abschnitten des Dokuments:
+        Du bist ein Experte für Inhaltszusammenfassungen. Erstelle auf Basis der folgenden Textabschnitte eine umfassende Zusammenfassung des Dokuments.
+
+        Textauszüge:
         {combined_text}
         
-        Erstelle eine ausführliche Zusammenfassung (ca. 200-300 Wörter), die:
-        1. Den Dokumenttyp identifiziert
-        2. Die Hauptthemen und wichtigsten Punkte detailliert beschreibt
-        3. Die wichtigsten Schlussfolgerungen oder Ergebnisse zusammenfasst
+        # Ausgabeanforderungen
+        - Gib eine ausführliche Zusammenfassung im Fließtext zurück (200-300 Wörter).
+        - Die Zusammenfassung soll den Dokumenttyp, Hauptthemen und Schlüsselpunkte identifizieren und wichtige Ergebnisse zusammenfassen.
+        - Gib nur die Zusammenfassung ohne zusätzliche Erklärungen oder Einleitungen zurück.
         """
 
         return await self.llm_provider.generate(prompt)
@@ -90,11 +96,15 @@ class PDFAnalysisPipeline:
         combined_text = "\n".join(doc.page_content for doc in relevant_chunks)
 
         prompt = f"""
-        Basierend auf diesem Textauszug:
+        Erstelle eine kurze Zusammenfassung der zentralen Inhalte auf Basis der folgenden Textauszüge.
+
+        Textauszüge:
         {combined_text}
         
-        Fasse die wichtigsten Kernaussagen in 2-3 prägnanten Sätzen zusammen.
-        Die Zusammenfassung sollte maximal 50 Wörter umfassen."""
+        # Ausgabeanforderungen
+        - Fasse die zentralen Inhalte in 2-3 Sätzen zusammen (maximal 50 Wörter).
+        - Gib nur die Zusammenfassung zurück, ohne Einleitungen, Anmerkungen oder weitere Erklärungen.
+        """
 
         return await self.llm_provider.generate(prompt)
 
@@ -106,11 +116,17 @@ class PDFAnalysisPipeline:
         relevant_chunks = vectorstore.similarity_search(query, k=3)
         combined_text = "\n".join([doc.page_content for doc in relevant_chunks])
 
-        prompt = f"""Basierend auf diesen Abschnitten des Dokuments:
+        prompt = f"""
+        Basierend auf den folgenden Textabschnitten, erzeuge eine Liste relevanter Schlagwörter, die die Hauptthemen und Inhalte des Dokuments beschreiben.
+
+        Textauszüge:
         {combined_text}
         
-        Generiere eine Liste von 5-8 relevanten Schlagwörtern, die die Hauptthemen, Inhalte und den Typ des Dokuments beschreiben.
-        Gib nur die Schlagwörter getrennt durch Kommas zurück."""
+        # Ausgabeanforderungen
+        - Gib nur die Schlagwörter als durch Kommas getrennte Liste zurück (5-8 Schlagwörter).
+        - Die Ausgabe soll nur die Schlagwörter enthalten, ohne Einleitungen, Erklärungen oder andere Texte.
+        """
 
         tags_text = await self.llm_provider.generate(prompt)
+        tags_text = tags_text.split("\n")[-1]  # Only take the last part of the output
         return [tag.strip() for tag in tags_text.split(",")]
