@@ -62,8 +62,9 @@ class PDFAnalysisPipeline:
         - Der Titel muss ohne Einleitung, zusätzliche Texte oder Erklärungen sein.
         """
 
-        title = await self.llm_provider.generate(prompt).strip
-        clean_title = re.sub(r"[^a-zA-Z0-9]", "", title)
+        title = await self.llm_provider.generate(prompt)
+        # Remove leading/trailing whitespace and special characters
+        clean_title = re.sub(r"[^\w\s]", "", title.strip())
 
         return clean_title
 
